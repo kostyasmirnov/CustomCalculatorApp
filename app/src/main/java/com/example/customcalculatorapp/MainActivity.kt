@@ -7,7 +7,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.example.customcalculatorapp.databinding.ActivityMainBinding
 
-class MainActivity: AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
@@ -34,34 +34,67 @@ class MainActivity: AppCompatActivity() {
             binding.btnMultiplication to "x",
             binding.btnDivision to "/",
             binding.btnDel to "DeleteLastSymbol",
-            binding.btnPercent to "%",
+            binding.btnPercent to "%", //need implement
             binding.btnPointer to ",",
-            binding.btnBrackets to "()"
+            binding.btnBrackets to "()" //need implement
         )
-
 
 
         fun handleButtonClick(value: Any?) {
 
             val currentStringCalculate = binding.tvCalculate.text.toString()
 
-            when(value) {
+            when (value) {
                 is Int -> {
-                    binding.tvCalculate.text = (currentStringCalculate + value).toString()
+                    binding.tvCalculate.text = (currentStringCalculate + value)
                 }
 
                 is String -> {
-                    when(value) {
-                        "+" -> { binding.tvCalculate.text = (currentStringCalculate + value) }
-                        "-" -> { binding.tvCalculate.text = (currentStringCalculate + value) }
-                        "=" -> { val result = parseAndCountResult(binding.tvCalculate.text.toString())
-                            if (result.rem(1) == 0.0) binding.tvResult.text = result.toInt().toString()
-                             else binding.tvResult.text = result.toString()
+                    when (value) {
+                        "+" -> {
+                            binding.tvCalculate.text = (currentStringCalculate + value)
+                        }
+
+                        "-" -> {
+                            binding.tvCalculate.text = (currentStringCalculate + value)
+                        }
+
+                        "=" -> {
+                            value.replace(",", ".")
+                            val result = parseAndCountResult(binding.tvCalculate.text.toString())
+                            if (result.rem(1) == 0.0) binding.tvResult.text =
+                                result.toInt().toString()
+                            else binding.tvResult.text = result.toString()
+                        }
+
+                        "x" -> {
+                            binding.tvCalculate.text = (currentStringCalculate + value)
+                        }
+
+                        "/" -> {
+                            binding.tvCalculate.text = (currentStringCalculate + value)
+                        }
+
+                        "," -> {
+                            var counterPointer = 0
+                            if (binding.tvCalculate.text.toString().isNotEmpty() && counterPointer == 0) {
+                                binding.tvCalculate.text = (currentStringCalculate + value)
+                                counterPointer = 1
+                            } else if (counterPointer == 0) {
+                                binding.tvCalculate.text = (currentStringCalculate + value)
                             }
-                        "x" -> { binding.tvCalculate.text = (currentStringCalculate + value) }
-                        "/" -> { binding.tvCalculate.text = (currentStringCalculate + value)  }
-                        "," -> {}
+                        }
                         "clear" -> binding.tvCalculate.text = ""
+                        "DeleteLastSymbol" -> {
+                            val newExpression = delLastSymbol(binding.tvCalculate.text.toString())
+                            binding.tvCalculate.text = newExpression
+                        }
+                        "()" -> {
+                            val newExpression = checkAndAddBracket(binding.tvCalculate.text.toString())
+                        }
+                        "%" -> {
+                            if (currentStringCalculate != "") binding.tvCalculate.text = (currentStringCalculate + value)
+                        }
                     }
                 }
             }
@@ -76,35 +109,41 @@ class MainActivity: AppCompatActivity() {
 
 }
 
-fun performOperation(result: Double, number: Double, operator: Char?): Double {
+private fun performOperation(result: Double, number: Double, operator: Char?): Double {
     // Выполним операцию в соответствии с оператором
     return when (operator) {
         '+' -> result + number
         '-' -> result - number
         'x' -> result * number
         '/' -> result / number
-        else -> number // Если оператор не определен, вернем число без изменений
+        '%' -> result % number
+        else -> number
+    // Если оператор не определен, вернем число без изменений
     }
 }
 
-fun parseAndCountResult(calculateString: String): Double {
+private fun parseAndCountResult(calculateString: String): Double {
 
-    Log.d("MyCalculate", "What we want to calculate: $calculateString")
+    val parseStringForCalculate = replacePointer(calculateString)
+
+    Log.d("MyCalculate", "What we want to calculate: $parseStringForCalculate")
 
     var currentNumber = ""
     var currentOperator: Char? = null
     var result = 0.0
 
-    for (char in calculateString) {
+    for (char in parseStringForCalculate) {
         when {
-            char.isDigit() -> currentNumber += char
+            char.isDigit() || char == '.' -> currentNumber += char
             char.isWhitespace() -> continue
             else -> {
-                // Если мы дошли до символа, который не является цифрой и не пробелом, это оператор
-                // Преобразуем текущее число и оператор в результат, если они есть
                 if (currentNumber.isNotEmpty()) {
                     val number = currentNumber.toDouble()
-                    result = performOperation(result, number, currentOperator)
+                    result = if (currentOperator == null) {
+                        number
+                    } else {
+                        performOperation(result, number, currentOperator)
+                    }
                     currentNumber = ""
                 }
                 currentOperator = char
@@ -112,12 +151,45 @@ fun parseAndCountResult(calculateString: String): Double {
         }
     }
 
-    // Обработаем оставшееся число и оператор, если они есть
-    if (currentNumber.isNotEmpty() && currentOperator != null) {
+    if (currentNumber.isNotEmpty()) {
         val number = currentNumber.toDouble()
-        result = performOperation(result, number, currentOperator)
+        result = if (currentOperator == null) {
+            number
+        } else {
+            performOperation(result, number, currentOperator)
+        }
     }
-
     Log.d("MyCalculateResult", "What we calculated: $result")
-    return result
+
+    return formatResult(result)
+}
+
+private fun replacePointer(calculateString: String): String {
+    return calculateString.replace(",", ".")
+}
+
+private fun formatResult(value: Double): Double {
+    // Преобразуем число в строку с четырьмя знаками после запятой
+    val formattedString = "%.4f".format(value)
+    // Разделяем целую и дробную части
+    val parts = formattedString.split(".")
+    val fractionalPart = parts[1]
+
+    // Проверяем первые два знака дробной части
+    return if (fractionalPart.startsWith("00")) {
+        "%.2f".format(value).toDouble()
+    } else {
+        formattedString.toDouble()
+    }
+}
+
+private fun delLastSymbol(expression: String): String {
+    return expression.dropLast(1)
+}
+
+private fun checkAndAddBracket(expression: String): Any {
+    var resultExpression = ""
+    if (!expression.last().equals("(")) resultExpression =  expression + "("
+    if (!expression.last().equals(")")) resultExpression =  expression + ")"
+    return resultExpression
 }
