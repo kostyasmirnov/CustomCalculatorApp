@@ -14,8 +14,8 @@ const val plus = "+"
 const val minus = "-"
 const val clear = "clear"
 const val equals = "="
-const val multiplication = "x"
-const val division = "/"
+const val multiply = "x"
+const val devide = "/"
 const val del = "DeleteLastSymbol"
 const val percent = "%"
 const val pointer = ","
@@ -45,8 +45,8 @@ class MainActivity : AppCompatActivity() {
             binding.btnMinus to minus,
             binding.btnClear to clear,
             binding.btnEquals to equals,
-            binding.btnMultiplication to multiplication,
-            binding.btnDivision to division,
+            binding.btnMultiplication to multiply,
+            binding.btnDivision to devide,
             binding.btnDel to del,
             binding.btnPercent to percent,
             binding.btnPointer to pointer,
@@ -77,9 +77,9 @@ class MainActivity : AppCompatActivity() {
                             else binding.tvResult.text = result.toString()
                         }
 
-                        multiplication -> binding.tvCalculate.text = checkDuplicate(currentStringCalculate,value)
+                        multiply -> binding.tvCalculate.text = checkDuplicate(currentStringCalculate,value)
 
-                        division -> binding.tvCalculate.text = checkDuplicate(currentStringCalculate,value)
+                        devide -> binding.tvCalculate.text = checkDuplicate(currentStringCalculate,value)
 
                         pointer -> binding.tvCalculate.text = checkDuplicate(currentStringCalculate,value)
 
