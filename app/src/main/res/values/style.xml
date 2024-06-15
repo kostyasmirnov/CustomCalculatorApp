@@ -13,11 +13,12 @@
         <item name="android:layout_marginStart">@dimen/start_margin_buttons</item>
     </style>
 
-    <style name="StyleResultViewCalcuate" >
+    <style name="StyleResultViewCalculate" >
         <item name="android:padding">8dp</item>
         <item name="android:textColor">@color/green</item>
         <item name="android:textAlignment">textEnd</item>
         <item name="fontFamily">@font/lora_medium</item>
+        <item name="android:textSize">70sp</item>
     </style>
 
 </resources>
