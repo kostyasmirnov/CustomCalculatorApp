@@ -1,13 +1,27 @@
 package com.example.customcalculatorapp
 
 import android.os.Bundle
-import android.os.DeadObjectException
-import android.util.Log
 import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.customcalculatorapp.databinding.ActivityMainBinding
+import java.util.Stack
 
-class MainActivity: AppCompatActivity() {
+const val lastSymbolNotNumberToast = "The last character is not a number, remove it or add a number"
+const val warnMesDuplicateSymbolToast = "You cannot add 2 identical mathematical symbols"
+const val warnMesFirstNumber = "The first character must be a number"
+const val plus = "+"
+const val minus = "-"
+const val clear = "clear"
+const val equals = "="
+const val multiply = "x"
+const val devide = "/"
+const val del = "DeleteLastSymbol"
+const val percent = "%"
+const val pointer = ","
+const val brackets = "()"
+
+class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
@@ -27,97 +41,209 @@ class MainActivity: AppCompatActivity() {
             binding.btn7 to 7,
             binding.btn8 to 8,
             binding.btn9 to 9,
-            binding.btnPlus to "+",
-            binding.btnMinus to "-",
-            binding.btnClear to "clear",
-            binding.btnEquals to "=",
-            binding.btnMultiplication to "x",
-            binding.btnDivision to "/",
-            binding.btnDel to "DeleteLastSymbol",
-            binding.btnPercent to "%",
-            binding.btnPointer to ",",
-            binding.btnBrackets to "()"
+            binding.btnPlus to plus,
+            binding.btnMinus to minus,
+            binding.btnClear to clear,
+            binding.btnEquals to equals,
+            binding.btnMultiplication to multiply,
+            binding.btnDivision to devide,
+            binding.btnDel to del,
+            binding.btnPercent to percent,
+            binding.btnPointer to pointer,
+            binding.btnBrackets to brackets
         )
-
 
 
         fun handleButtonClick(value: Any?) {
 
             val currentStringCalculate = binding.tvCalculate.text.toString()
 
-            when(value) {
+            when (value) {
                 is Int -> {
-                    binding.tvCalculate.text = (currentStringCalculate + value).toString()
+                    binding.tvCalculate.text = (currentStringCalculate + value)
                 }
 
                 is String -> {
-                    when(value) {
-                        "+" -> { binding.tvCalculate.text = (currentStringCalculate + value) }
-                        "-" -> { binding.tvCalculate.text = (currentStringCalculate + value) }
-                        "=" -> { val result = parseAndCountResult(binding.tvCalculate.text.toString())
-                            if (result.rem(1) == 0.0) binding.tvResult.text = result.toInt().toString()
-                             else binding.tvResult.text = result.toString()
-                            }
-                        "x" -> { binding.tvCalculate.text = (currentStringCalculate + value) }
-                        "/" -> { binding.tvCalculate.text = (currentStringCalculate + value)  }
-                        "," -> {}
-                        "clear" -> binding.tvCalculate.text = ""
+                    when (value) {
+                        plus -> binding.tvCalculate.text = checkDuplicate(currentStringCalculate,value)
+
+                        minus -> binding.tvCalculate.text = checkDuplicate(currentStringCalculate,value)
+
+                        equals -> {
+                            value.replace(",", ".")
+                            val result = parseAndCountResult(binding.tvCalculate.text.toString())
+                            if (result.rem(1) == 0.0) binding.tvResult.text =
+                                result.toInt().toString()
+                            else binding.tvResult.text = result.toString()
+                        }
+
+                        multiply -> binding.tvCalculate.text = checkDuplicate(currentStringCalculate,value)
+
+                        devide -> binding.tvCalculate.text = checkDuplicate(currentStringCalculate,value)
+
+                        pointer -> binding.tvCalculate.text = checkDuplicate(currentStringCalculate,value)
+
+                        clear -> binding.tvCalculate.text = ""
+                        del -> {
+                            val newExpression = delLastSymbol(binding.tvCalculate.text.toString())
+                            binding.tvCalculate.text = newExpression
+                        }
+
+                        brackets -> {
+                            val newExpression = checkAndAddBracket(currentStringCalculate)
+                            binding.tvCalculate.text = newExpression
+                        }
+
+                        percent -> binding.tvCalculate.text = checkDuplicate(currentStringCalculate,value)
                     }
                 }
             }
         }
 
-        mapKeysInout.forEach { button, value ->
+        mapKeysInout.forEach { (button, value) ->
             button.setOnClickListener {
                 handleButtonClick(value)
             }
         }
     }
 
+    private fun parseAndCountResult(calculateString: String): Double {
+        val lastSymbolNotNumber = listOf('-', '+', 'x', '/', '%', ',')
+        for (symbol in lastSymbolNotNumber) {
+            if (calculateString.last() == symbol)
+                showShortToast(lastSymbolNotNumberToast)
+        }
+        val rpn = convertToRPN(calculateString)
+        return evaluateRPN(rpn)
+    }
+
+    private fun checkDuplicate(calculateString: String, value: String): String {
+        if (calculateString.isEmpty()) {
+            showShortToast(warnMesFirstNumber)
+            return ""
+        }
+        if (calculateString.isNotEmpty() && calculateString.last() != value.last()) return calculateString + value
+        else {
+            showShortToast(warnMesDuplicateSymbolToast)
+            return calculateString
+        }
+    }
+
+    private fun showShortToast(mes: String) {
+        Toast.makeText(this, mes, Toast.LENGTH_SHORT).show()
+    }
+
 }
 
-fun performOperation(result: Double, number: Double, operator: Char?): Double {
-    // Выполним операцию в соответствии с оператором
+private fun performOperation(result: Double, number: Double, operator: Char?): Double {
     return when (operator) {
         '+' -> result + number
         '-' -> result - number
         'x' -> result * number
         '/' -> result / number
-        else -> number // Если оператор не определен, вернем число без изменений
+        '%' -> result * (number / 100)
+        else -> number
     }
 }
 
-fun parseAndCountResult(calculateString: String): Double {
-
-    Log.d("MyCalculate", "What we want to calculate: $calculateString")
-
+private fun convertToRPN(expression: String): List<String> {
+    val output = mutableListOf<String>()
+    val operators = Stack<Char>()
     var currentNumber = ""
-    var currentOperator: Char? = null
-    var result = 0.0
 
-    for (char in calculateString) {
+    fun addNumber() {
+        if (currentNumber.isNotEmpty()) {
+            output.add(currentNumber)
+            currentNumber = ""
+        }
+    }
+
+    for (char in expression) {
         when {
-            char.isDigit() -> currentNumber += char
-            char.isWhitespace() -> continue
-            else -> {
-                // Если мы дошли до символа, который не является цифрой и не пробелом, это оператор
-                // Преобразуем текущее число и оператор в результат, если они есть
-                if (currentNumber.isNotEmpty()) {
-                    val number = currentNumber.toDouble()
-                    result = performOperation(result, number, currentOperator)
-                    currentNumber = ""
+            char.isDigit() || char == '.' -> currentNumber += char
+            char == '(' -> operators.push(char)
+            char == ')' -> {
+                addNumber()
+                while (operators.isNotEmpty() && operators.peek() != '(') {
+                    output.add(operators.pop().toString())
                 }
-                currentOperator = char
+                if (operators.isNotEmpty()) {
+                    operators.pop()
+                }
+            }
+
+            char in listOf('+', '-', 'x', '/', '%') -> {
+                addNumber()
+                while (operators.isNotEmpty() && precedence(char) <= precedence(operators.peek())) {
+                    output.add(operators.pop().toString())
+                }
+                operators.push(char)
             }
         }
     }
 
-    // Обработаем оставшееся число и оператор, если они есть
-    if (currentNumber.isNotEmpty() && currentOperator != null) {
-        val number = currentNumber.toDouble()
-        result = performOperation(result, number, currentOperator)
+    addNumber()
+    while (operators.isNotEmpty()) {
+        output.add(operators.pop().toString())
     }
 
-    Log.d("MyCalculateResult", "What we calculated: $result")
-    return result
+    return output
+}
+
+private fun precedence(op: Char): Int {
+    return when (op) {
+        '+', '-' -> 1
+        'x', '/' -> 2
+        '%' -> 3
+        else -> 0
+    }
+}
+
+private fun evaluateRPN(rpn: List<String>): Double {
+    val stack = Stack<Double>()
+
+    for (token in rpn) {
+        when {
+            token.toDoubleOrNull() != null -> stack.push(token.toDouble())
+            token.length == 1 && token[0] in listOf('+', '-', 'x', '/', '%') -> {
+                val number2 = stack.pop()
+                val number1 = stack.pop()
+                val result = performOperation(number1, number2, token[0])
+                stack.push(result)
+            }
+        }
+    }
+
+    return stack.pop()
+}
+
+//private fun replacePointer(calculateString: String): String {
+//    return calculateString.replace(",", ".")
+//}
+//
+//private fun formatResult(value: Double): Double {
+//    val formattedString = "%.4f".format(value)
+//    val parts = formattedString.split(".")
+//    val fractionalPart = parts[1]
+//
+//    return if (fractionalPart.startsWith("00")) {
+//        "%.2f".format(value).toDouble()
+//    } else {
+//        formattedString.toDouble()
+//    }
+//}
+
+private fun delLastSymbol(expression: String): String {
+    return expression.dropLast(1)
+}
+
+private fun checkAndAddBracket(expression: String): String {
+    val openBracketCount = expression.count { it == '(' }
+    val closeBracketCount = expression.count { it == ')' }
+
+    return if (openBracketCount > closeBracketCount) {
+        "$expression)"
+    } else {
+        "$expression("
+    }
 }
