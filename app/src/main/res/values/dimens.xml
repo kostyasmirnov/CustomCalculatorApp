@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="end_margin_buttons">8dp</dimen>
+    <dimen name="start_margin_buttons">8dp</dimen>
+</resources>

@@ -8,22 +8,18 @@
 
     <TextView
         android:id="@+id/tvCalculate"
-        style="@style/StyleButtonCalculate"
-        android:textSize="60sp"
+        style="@style/StyleResultViewCalculate"
         android:layout_width="match_parent"
         android:layout_height="125dp"
         app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="8dp"
         tools:text="2+2" />
 
     <TextView
         android:id="@+id/tvResult"
+        style="@style/StyleResultViewCalculate"
         android:layout_width="match_parent"
         android:layout_height="125dp"
         android:padding="8dp"
-        android:textAlignment="textEnd"
-        android:textColor="@color/green"
-        android:textSize="70sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvCalculate"
@@ -35,7 +31,6 @@
         android:layout_height="0dp"
         android:background="@color/dark_gray"
         android:columnCount="4"
-        android:padding="8dp"
         android:rowCount="5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -45,46 +40,49 @@
         <Button
             android:id="@+id/btnDivision"
             style="@style/StyleButtonCalculate"
-            android:layout_width="0dp"
+            android:layout_width="80dp"
             android:layout_height="0dp"
             android:layout_row="0"
             android:layout_rowWeight="1"
             android:layout_column="3"
             android:layout_columnWeight="1"
-            android:text="Division(addIcon)" />
+            android:text="@string/division"
+            android:textColor="@color/full_black" />
 
         <Button
             android:id="@+id/btnPercent"
             style="@style/StyleButtonCalculate"
-            android:layout_width="0dp"
+            android:layout_width="60dp"
             android:layout_height="0dp"
             android:layout_row="0"
             android:layout_rowWeight="1"
             android:layout_column="2"
             android:layout_columnWeight="1"
-            android:text="%" />
+            android:text="@string/percent" />
 
         <Button
             android:id="@+id/btnBrackets"
             style="@style/StyleButtonCalculate"
-            android:layout_width="0dp"
+            android:layout_width="60dp"
             android:layout_height="0dp"
             android:layout_row="0"
             android:layout_rowWeight="1"
             android:layout_column="1"
             android:layout_columnWeight="1"
-            android:text="()" />
+            android:text="@string/brackets" />
 
         <Button
             android:id="@+id/btnClear"
             style="@style/StyleButtonCalculate"
-            android:layout_width="0dp"
+            android:layout_width="60dp"
             android:layout_height="0dp"
             android:layout_row="0"
             android:layout_rowWeight="1"
             android:layout_column="0"
             android:layout_columnWeight="1"
-            android:text="AC(cler)" />
+            android:text="@string/btn_clear"
+            android:textColor="@color/dark_gray"
+            android:textSize="30sp"/>
 
         <Button
             android:id="@+id/btnMultiplication"
@@ -95,7 +93,8 @@
             android:layout_rowWeight="1"
             android:layout_column="3"
             android:layout_columnWeight="1"
-            android:text="x" />
+            android:text="@string/multiplication"
+            android:textColor="@color/full_black"/>
 
         <Button
             android:id="@+id/btn9"
@@ -106,7 +105,7 @@
             android:layout_rowWeight="1"
             android:layout_column="2"
             android:layout_columnWeight="1"
-            android:text="9" />
+            android:text="@string/nine" />
 
         <Button
             android:id="@+id/btn8"
@@ -117,7 +116,7 @@
             android:layout_rowWeight="1"
             android:layout_column="1"
             android:layout_columnWeight="1"
-            android:text="8" />
+            android:text="@string/eight" />
 
         <Button
             android:id="@+id/btn7"
@@ -128,7 +127,7 @@
             android:layout_rowWeight="1"
             android:layout_column="0"
             android:layout_columnWeight="1"
-            android:text="7" />
+            android:text="@string/seven"/>
 
         <Button
             android:id="@+id/btnMinus"
@@ -139,7 +138,7 @@
             android:layout_rowWeight="1"
             android:layout_column="3"
             android:layout_columnWeight="1"
-            android:text="-" />
+            android:drawableTop="@drawable/ic_minus" />
 
         <Button
             android:id="@+id/btn6"
@@ -150,7 +149,7 @@
             android:layout_rowWeight="1"
             android:layout_column="2"
             android:layout_columnWeight="1"
-            android:text="6" />
+            android:text="@string/six" />
 
         <Button
             android:id="@+id/btn5"
@@ -161,7 +160,8 @@
             android:layout_rowWeight="1"
             android:layout_column="1"
             android:layout_columnWeight="1"
-            android:text="5" />
+            android:text="@string/five"
+            android:layout_marginEnd="4dp"/>
 
         <Button
             android:id="@+id/btn4"
@@ -172,7 +172,7 @@
             android:layout_rowWeight="1"
             android:layout_column="0"
             android:layout_columnWeight="1"
-            android:text="4" />
+            android:text="@string/four"/>
 
         <Button
             android:id="@+id/btnPlus"
@@ -183,7 +183,8 @@
             android:layout_rowWeight="1"
             android:layout_column="3"
             android:layout_columnWeight="1"
-            android:text="+" />
+            android:text="@string/plus"
+            android:textColor="@color/full_black"/>
 
         <Button
             android:id="@+id/btn3"
@@ -194,7 +195,7 @@
             android:layout_rowWeight="1"
             android:layout_column="2"
             android:layout_columnWeight="1"
-            android:text="3" />
+            android:text="@string/three" />
 
         <Button
             android:id="@+id/btn2"
@@ -205,7 +206,7 @@
             android:layout_rowWeight="1"
             android:layout_column="1"
             android:layout_columnWeight="1"
-            android:text="2" />
+            android:text="@string/two" />
 
         <Button
             android:id="@+id/btn1"
@@ -216,7 +217,7 @@
             android:layout_rowWeight="1"
             android:layout_column="0"
             android:layout_columnWeight="1"
-            android:text="1" />
+            android:text="@string/one"/>
 
         <Button
             android:id="@+id/btnEquals"
@@ -227,7 +228,8 @@
             android:layout_rowWeight="1"
             android:layout_column="3"
             android:layout_columnWeight="1"
-            android:text="=" />
+            android:text="@string/equals"
+            android:textColor="@color/full_black"/>
 
         <Button
             android:id="@+id/btnDel"
@@ -238,7 +240,7 @@
             android:layout_rowWeight="1"
             android:layout_column="2"
             android:layout_columnWeight="1"
-            android:text="delete(add_icon)" />
+            android:background="@drawable/ic_del"/>
 
         <Button
             android:id="@+id/btnPointer"
@@ -249,7 +251,7 @@
             android:layout_rowWeight="1"
             android:layout_column="1"
             android:layout_columnWeight="1"
-            android:text="," />
+            android:text="@string/pointer" />
 
         <Button
             android:id="@+id/btn0"
@@ -260,7 +262,7 @@
             android:layout_rowWeight="1"
             android:layout_column="0"
             android:layout_columnWeight="1"
-            android:text="0" />
+            android:text="@string/zero"/>
 
     </GridLayout>
 
