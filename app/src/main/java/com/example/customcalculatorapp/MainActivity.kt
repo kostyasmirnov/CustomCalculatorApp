@@ -1,16 +1,12 @@
 package com.example.customcalculatorapp
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.customcalculatorapp.databinding.ActivityMainBinding
 import java.util.Stack
 
-const val TAG = "MyCalculator"
-const val inputLog = "What we want calculate: "
-const val outputLog = "What we calculate: "
 const val lastSymbolNotNumberToast = "The last character is not a number, remove it or add a number"
 const val warnMesDuplicateSymbolToast = "You cannot add 2 identical mathematical symbols"
 const val warnMesFirstNumber = "The first character must be a number"
@@ -18,8 +14,8 @@ const val plus = "+"
 const val minus = "-"
 const val clear = "clear"
 const val equals = "="
-const val multiplication = "x"
-const val division = "/"
+const val multiply = "x"
+const val devide = "/"
 const val del = "DeleteLastSymbol"
 const val percent = "%"
 const val pointer = ","
@@ -49,8 +45,8 @@ class MainActivity : AppCompatActivity() {
             binding.btnMinus to minus,
             binding.btnClear to clear,
             binding.btnEquals to equals,
-            binding.btnMultiplication to multiplication,
-            binding.btnDivision to division,
+            binding.btnMultiplication to multiply,
+            binding.btnDivision to devide,
             binding.btnDel to del,
             binding.btnPercent to percent,
             binding.btnPointer to pointer,
@@ -69,11 +65,9 @@ class MainActivity : AppCompatActivity() {
 
                 is String -> {
                     when (value) {
-                        plus -> binding.tvCalculate.text =
-                            checkDuplicate(currentStringCalculate, value)
+                        plus -> binding.tvCalculate.text = checkDuplicate(currentStringCalculate,value)
 
-                        minus -> binding.tvCalculate.text =
-                            checkDuplicate(currentStringCalculate, value)
+                        minus -> binding.tvCalculate.text = checkDuplicate(currentStringCalculate,value)
 
                         equals -> {
                             value.replace(",", ".")
@@ -83,17 +77,13 @@ class MainActivity : AppCompatActivity() {
                             else binding.tvResult.text = result.toString()
                         }
 
-                        multiplication -> binding.tvCalculate.text =
-                            checkDuplicate(currentStringCalculate, value)
+                        multiply -> binding.tvCalculate.text = checkDuplicate(currentStringCalculate,value)
 
-                        division -> binding.tvCalculate.text =
-                            checkDuplicate(currentStringCalculate, value)
+                        devide -> binding.tvCalculate.text = checkDuplicate(currentStringCalculate,value)
 
-                        pointer -> binding.tvCalculate.text =
-                            checkDuplicate(currentStringCalculate, value)
+                        pointer -> binding.tvCalculate.text = checkDuplicate(currentStringCalculate,value)
 
                         clear -> binding.tvCalculate.text = ""
-
                         del -> {
                             val newExpression = delLastSymbol(binding.tvCalculate.text.toString())
                             binding.tvCalculate.text = newExpression
@@ -104,8 +94,7 @@ class MainActivity : AppCompatActivity() {
                             binding.tvCalculate.text = newExpression
                         }
 
-                        percent -> binding.tvCalculate.text =
-                            checkDuplicate(currentStringCalculate, value)
+                        percent -> binding.tvCalculate.text = checkDuplicate(currentStringCalculate,value)
                     }
                 }
             }
@@ -162,8 +151,6 @@ private fun convertToRPN(expression: String): List<String> {
     val operators = Stack<Char>()
     var currentNumber = ""
 
-    Log.d(TAG, inputLog + expression)
-
     fun addNumber() {
         if (currentNumber.isNotEmpty()) {
             output.add(currentNumber)
@@ -200,7 +187,6 @@ private fun convertToRPN(expression: String): List<String> {
         output.add(operators.pop().toString())
     }
 
-    Log.d(TAG, outputLog)
     return output
 }
 
@@ -252,8 +238,8 @@ private fun delLastSymbol(expression: String): String {
 }
 
 private fun checkAndAddBracket(expression: String): String {
-    val openBracketCount: Int = expression.count { it == '(' }
-    val closeBracketCount: Int = expression.count { it == ')' }
+    val openBracketCount = expression.count { it == '(' }
+    val closeBracketCount = expression.count { it == ')' }
 
     return if (openBracketCount > closeBracketCount) {
         "$expression)"
